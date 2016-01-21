@@ -67,7 +67,7 @@
     if (!pEl.hasAttribute('tabIndex')) {
       pEl.setAttribute('tabIndex', '-1');
     }
-
+    
     if (alwaysCaptureHotkeys) {
       player.one('play', function() {
         pEl.focus(); // Fixes the .vjs-big-play-button handing focus back to body instead of the player
@@ -79,9 +79,20 @@
       var cancelFocusingPlayer = function() {
         clearTimeout(focusingPlayerTimeout);
       };
+      // utility function; checks if second parameter is parent for first
+      var isParent = function(element, parentCandidate) {
+        if (element.parentElement === parentCandidate) {
+          return true;
+        } else if (element.parentElement === document.body) {
+          return false;
+        } else {
+          return isParent(element.parentElement, parentCandidate);
+        }
+      }
       var focusingPlayerTimeout = setTimeout(function() {
         player.off('useractive', cancelFocusingPlayer);
-        if (doc.activeElement.parentElement == pEl.querySelector('.vjs-control-bar')) {
+        var isBarActive = isParent(doc.activeElement.parentElement, pEl.querySelector('.vjs-control-bar'))
+        if (isBarActive) {
           pEl.focus();
         }
       }, 10);
